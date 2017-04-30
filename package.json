@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin":{
-    "euglena":"src/index.js"
+    "euglena":"./src/index.js"
   },
   "repository": {
     "type": "git",
