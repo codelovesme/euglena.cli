@@ -4,10 +4,13 @@
   "description": "Command Line Interface to create and manage euglena projects as simple as possible",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc src/index.ts",
+    "test": "euglena n new_app -t node",
+    "clean": "rm new_app -rf",
+    "retest":"npm run clean && npm run build && npm run test"
   },
-  "bin":{
-    "euglena":"./src/index.js"
+  "bin": {
+    "euglena": "./src/index.js"
   },
   "repository": {
     "type": "git",
@@ -18,5 +21,21 @@
   "bugs": {
     "url": "https://github.com/codelovesme/euglena.cli/issues"
   },
-  "homepage": "https://github.com/codelovesme/euglena.cli#readme"
+  "homepage": "https://github.com/codelovesme/euglena.cli#readme",
+  "devDependencies": {
+    "@types/commander": "^2.9.0",
+    "@types/node": "^7.0.14",
+    "@types/progress": "^1.1.28"
+  },
+  "dependencies": {
+    "@euglena/core": "git+https://github.com/codelovesme/euglena#develop",
+    "commander": "^2.9.0",
+    "euglena.organelle.time.js": "codelovesme/euglena.organelle.time.js",
+    "json-beautify": "^1.0.1",
+    "progress": "^2.0.0",
+    "sys": "0.0.1"
+  },
+  "directories": {
+    "test": "test"
+  }
 }
