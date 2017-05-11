@@ -86,6 +86,9 @@ program
                 });
                 process.stdin.pipe(child.stdin);
                 break;
+            case "angular":
+                ///TODO
+                break;
         }
     });
 
