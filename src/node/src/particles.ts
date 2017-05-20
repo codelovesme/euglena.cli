@@ -1,33 +1,24 @@
 
-import { euglena } from "@euglena/core";
-import { euglena_template } from "@euglena/template";
+import * as euglena from "@euglena/core";
+import * as euglena_template from "@euglena/template";
 
 const euglenaName = "$myself";
 
-const particles: euglena.being.Particle[] = [
+const particles: euglena.AnyParticle[] = [
     {
         meta: {
-            name: euglena_template.being.alive.constants.particles.EuglenaName,
-            of:euglenaName
+            name: euglena_template.alive.constants.particles.EuglenaName,
+            of: euglenaName
         },
         data: euglenaName
     },
-    {
-        meta: {
-            name: euglena_template.being.alive.constants.particles.OrganelleList,
-            of:euglenaName
-        },
-        data: [euglena_template.being.alive.constants.organelles.TimeOrganelle]
-    },
-    {
-        meta: {
-            name: euglena_template.being.alive.constants.particles.TimeOrganelleSap,
-            of:euglenaName
-        },
-        data: {
-            euglenaName: euglenaName
-        }
-    },
+    new euglena_template.alive.particle.OrganelleInfo(
+        euglena_template.alive.constants.organelles.TimeOrganelle,
+        euglena_template.alive.particle.OrganelleInfoLocationType.NodeModules,
+        "@euglena/organelle.time.js",
+        new euglena_template.alive.particle.TimeOrganelleSap({euglenaName},euglenaName),
+        euglenaName
+    )
 ]
 
 export = particles;

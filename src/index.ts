@@ -59,8 +59,8 @@ program
                                 json.scripts.start = "node ./src/index.js";
                                 json.main = "src/index.js";
                                 json.dependencies = {
-                                    "@euglena/core": "0.1.0",
-                                    "@euglena/template": "0.0.7",
+                                    "@euglena/core": "0.1.6",
+                                    "@euglena/template": "1.0.1",
                                     "euglena.organelle.time.js": "0.0.2",
                                     "jsonminify": "^0.4.1"
                                 };

@@ -3,15 +3,17 @@
  */
 
 "use strict";
-import { euglena } from "@euglena/core";
-import { euglena_template } from "@euglena/template";
+import * as euglena from "@euglena/core";
+import * as euglena_template from "@euglena/template";
 import * as path from "path";
 import * as fs from "fs";
+import { sys, js } from "cessnalib";
 var jsonminify = require("jsonminify");
 
-import Particle = euglena.being.Particle;
-import interaction = euglena.being.interaction;
-import constants = euglena_template.being.alive.constants;
+import Particle = euglena.AnyParticle;
+import interaction = euglena.interaction;
+import constants = euglena_template.alive.constants;
+import OrganelleInfo = euglena_template.alive.particle.OrganelleInfo;
 
 import * as particles from "./particles";
 import * as chromosome from "./chromosome";
@@ -23,26 +25,27 @@ process.on('uncaughtException', (err: any) => {
 let applicationDirectory = path.join(path.resolve(__dirname), "../");
 
 //Load Organelles
-let files = fs.readdirSync(path.join(applicationDirectory, "./node_modules"));
-let euglenaName = particles[euglena.sys.type.StaticTools.Array.indexOf(particles, { meta: { name: constants.particles.EuglenaName }, data: null }, (ai: Particle, t: Particle) => ai.meta.name == t.meta.name)].data;
-let organelleList = particles[euglena.sys.type.StaticTools.Array.indexOf(particles, { meta: { name: constants.particles.OrganelleList }, data: null }, (ai: Particle, t: Particle) => ai.meta.name == t.meta.name)].data;
-let organelles: Array<euglena.being.alive.Organelle<any>> = [];
-for (let file of files) {
-    if (!file || !file.includes("euglena.organelle.")) continue;
-    let organelle: euglena.being.alive.Organelle<any> = null;
-    try {
-        organelle = <euglena.being.alive.Organelle<{}>>new (require(path.join(applicationDirectory, "./node_modules/", file))).Organelle();
-    } catch (e) {
-        console.log(file + " " + e.message);
+let euglenaName = particles[sys.type.StaticTools.Array.indexOf(particles, { meta: { name: constants.particles.EuglenaName }, data: null }, (ai: Particle, t: Particle) => ai.meta.name == t.meta.name)].data;
+let organelles: Array<euglena.alive.Organelle<any>> = [];
+let organelleInfos = sys.type.StaticTools.Array.getAllMatched(particles, { meta: { name: constants.particles.OrganelleInfo }, data: null }, (ai: Particle, t: Particle) => ai.meta.name === t.meta.name) as OrganelleInfo<any>[];
+for (let o of organelleInfos) {
+    switch (o.data.location.type) {
+        case euglena_template.alive.particle.OrganelleInfoLocationType.NodeModules:
+            let organelle: euglena.alive.Organelle<any> = null;
+            try {
+                organelle = <euglena.alive.Organelle<{}>>new (require(path.join(applicationDirectory, "./node_modules/", o.data.location.path))).Organelle();
+            } catch (e) {
+                console.log(o.data.name + " " + e.message);
+            }
+            if (!organelle) continue;
+            organelles.push(organelle);
+            console.log(`${organelle.name} attached to the body.`);
+            break;
     }
-    if (!organelle) continue;
-    if (organelleList.indexOf(organelle.name) < 0) continue;
-    organelles.push(organelle);
-    console.log(`${organelle.name} attached to the body.`);
 }
 
 //Load Genes
 
-new euglena.being.alive.Cytoplasm(euglenaName, particles, organelles, chromosome);
+new euglena.alive.Cytoplasm(euglenaName, particles, organelles, chromosome);
 
-euglena.being.alive.Cytoplasm.receive(new euglena_template.being.alive.particle.EuglenaHasBeenBorn(euglenaName), "universe");
+euglena.alive.Cytoplasm.receive(new euglena_template.alive.particle.EuglenaHasBeenBorn(euglenaName), "universe");

@@ -1,22 +1,23 @@
 
 "use strict";
 
-import { euglena_template } from "@euglena/template";
-import { euglena } from "@euglena/core";
+import { sys, js } from "cessnalib";
+import * as euglena_template from "@euglena/template";
+import * as euglena from "@euglena/core";
 import * as path from "path";
 import * as fs from "fs";
 
 import * as _particles from "./particles";
 
-import constants = euglena_template.being.alive.constants;
-import ParticleV2 = euglena.being.ParticleV2;
-import Particle = euglena.being.Particle;
-import organelles = euglena_template.being.alive.organelle;
-import particles = euglena_template.being.alive.particle;
-import Cytoplasm = euglena.being.alive.Cytoplasm;
-import Gene = euglena.being.alive.dna.GeneV2;
+import constants = euglena_template.alive.constants;
+import ParticleV2 = euglena.ParticleV2;
+import Particle = euglena.AnyParticle;
+import organelles = euglena_template.alive.organelle;
+import particles = euglena_template.alive.particle;
+import Cytoplasm = euglena.alive.Cytoplasm;
+import Gene = euglena.alive.dna.GeneV2;
 
-let euglenaName = _particles[euglena.sys.type.StaticTools.Array.indexOf(_particles, { meta: { name: constants.particles.EuglenaName }, data: null }, (ai: Particle, t: Particle) => ai.meta.name == t.meta.name)].data;
+let euglenaName = _particles[sys.type.StaticTools.Array.indexOf(_particles, { meta: { name: constants.particles.EuglenaName }, data: null }, (ai: Particle, t: Particle) => ai.meta.name == t.meta.name)].data;
 
 //
 //Genes are particles of Nucleus
@@ -30,12 +31,15 @@ const chromosome: Gene[] = [
             console.log("Hello World !");
             let euglenaName = Cytoplasm.getParticle({ meta: { name: "EuglenaName" }, data: {} }).data;
             //fetch Query
-            let sap = Cytoplasm.getParticle({ meta: { name: euglena_template.being.alive.constants.particles.TimeOrganelleSap, of: euglenaName } });
-            Cytoplasm.transmit(euglena_template.being.alive.constants.organelles.TimeOrganelle, sap);
+            let timeOrganelleInfo = Cytoplasm.getParticle({
+                meta: { name: euglena_template.alive.constants.particles.OrganelleInfo, of: euglenaName },
+                data: { name: euglena_template.alive.constants.organelles.TimeOrganelle }
+            }) as euglena_template.alive.particle.OrganelleInfo<euglena_template.alive.particle.TimeOrganelleSap>;
+            Cytoplasm.transmit(euglena_template.alive.constants.organelles.TimeOrganelle, timeOrganelleInfo.data.sap);
         },
         euglenaName
     ),
-    new Gene(
+    new Gene( 
         "When received particle Time, print it on the console. ",
         { meta: { name: constants.particles.Time } },
         (particle: particles.Time) => {
