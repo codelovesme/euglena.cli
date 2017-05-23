@@ -55,17 +55,24 @@ program
                             //Inserting dependencies into pacakge.json
                             readFile(name + "/package.json", "utf-8", (err, text) => {
                                 let json = JSON.parse(text);
-                                json.scripts.build = "tsc -p .";
-                                json.scripts.start = "node ./src/index.js";
-                                json.main = "src/index.js";
+                                json.scripts.test = "mocha .dist/test/index.js";
+                                json.scripts.build = "gulp build && npm test";
+                                json.scripts.start = "npm run build && npm test && node .";
+                                json.main = ".dist/src/index.js";
                                 json.dependencies = {
+                                    "cessnalib":"^0.2.0",
                                     "@euglena/core": "0.1.6",
                                     "@euglena/template": "1.0.1",
-                                    "euglena.organelle.time.js": "0.0.2",
+                                    "@euglena/organelle.time.js": "^0.1.0",
                                     "jsonminify": "^0.4.1"
                                 };
                                 json.devDependencies = {
-                                    "@types/node": "^7.0.14"
+                                    "@types/node": "^7.0.14",
+                                    "@types/mocha": "^2.2.40",
+                                    "gulp": "^3.9.1",
+                                    "gulp-mocha": "^4.3.1",
+                                    "gulp-typescript": "^3.0.1",
+                                    "typescript":"^2.3.3"
                                 };
                                 text = beautify(json, null, 2, 10);
                                 writeFile(name + "/package.json", text, { "encoding": "utf-8" }, err_back);
