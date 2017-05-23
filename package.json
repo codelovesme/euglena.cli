@@ -1,6 +1,6 @@
 {
   "name": "@euglena/cli",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Command Line Interface to create and manage euglena projects as simple as possible",
   "main": "src/index.js",
   "scripts": {
@@ -28,7 +28,7 @@
     "@types/progress": "^1.1.28"
   },
   "dependencies": {
-    "@euglena/core": "^0.1.6", 
+    "@euglena/core": "^0.1.6",
     "@euglena/template": "^1.0.1",
     "cessnalib": "^0.2.0",
     "commander": "^2.9.0",
