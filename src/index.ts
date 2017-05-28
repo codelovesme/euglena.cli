@@ -32,26 +32,28 @@ program
         let bar = new ProgressBar(' generating [:bar] :percent :etas', barOpts);
         switch (options.type) {
             case "node":
-                bar.tick(10);
+                //bar.tick(10);
                 console.log("Generating directory structure.");
                 mkdirSync(name);
-                bar.tick(20);
+                //bar.tick(20);
                 //copy sample files into new app folder
                 console.log("Copying files into the new project.");
                 let c = exec('cp -r ' + __dirname + '/node/** ' + name, (err, stdout, stderr) => {
                     if (err) console.error(err);
                 });
                 c.on('error', (err) => console.log(err));
-                bar.tick(40);
+                //bar.tick(40);
                 let child = spawn('npm', ['init'], { cwd: name, });
                 child.stdout.setEncoding('utf-8');
+                child.stderr.setEncoding('utf-8');
                 child.stdout.on("data", (data: any) => {
                     if (data && data.includes("Is this ok? (yes)")) {
                         child.stdin.write("yes");
                         child.stdin.emit("finish");
                         console.log("package.json has been successfully generated");
                         process.stdin.emit("finish");
-                        waitPackage_jsonToBeCreated(name, () => {
+                        let packageFile = name + "/package.json";
+                        waitForPathToBeCreated(packageFile).then(() => {
                             //Inserting dependencies into pacakge.json
                             readFile(name + "/package.json", "utf-8", (err, text) => {
                                 let json = JSON.parse(text);
@@ -60,7 +62,7 @@ program
                                 json.scripts.start = "npm run build && npm test && node .";
                                 json.main = ".dist/src/index.js";
                                 json.dependencies = {
-                                    "cessnalib":"^0.2.0",
+                                    "cessnalib": "^0.2.0",
                                     "@euglena/core": "0.1.6",
                                     "@euglena/template": "1.0.1",
                                     "@euglena/organelle.time.js": "^0.1.0",
@@ -72,18 +74,23 @@ program
                                     "gulp": "^3.9.1",
                                     "gulp-mocha": "^4.3.1",
                                     "gulp-typescript": "^3.0.1",
-                                    "typescript":"^2.3.3"
+                                    "typescript": "^2.3.3"
                                 };
                                 text = beautify(json, null, 2, 10);
-                                writeFile(name + "/package.json", text, { "encoding": "utf-8" }, err_back);
-                            });
-                            //Insert euglenaName into file particles.ts
-                            readFile(name + "/src/particles.ts", "utf-8", (err, data) => {
-                                data = data.replace('$myself', name);
-                                writeFile(name + "/src/particles.ts", data, { "encoding": "utf-8" }, err_back);
+                                writeFile(packageFile, text, { "encoding": "utf-8" }, (err) => {
+                                    err_back(err, packageFile + " has been updated.");
+                                });
                             });
                         });
-
+                        let particlesTsFile = name + "/src/particles.ts";
+                        waitForPathToBeCreated(particlesTsFile).then(() => {
+                            readFile(particlesTsFile, "utf-8", (err, data) => {
+                                data = data.replace('$myself', name);
+                                writeFile(particlesTsFile, data, { "encoding": "utf-8" }, (err) => {
+                                    err_back(err, particlesTsFile + " has been updated.");
+                                });
+                            });
+                        });
                     } else {
                         console.log(data);
                     }
@@ -94,22 +101,73 @@ program
                 process.stdin.pipe(child.stdin);
                 break;
             case "angular":
-                ///TODO
+                let child2 = spawn('ng', ["new", name]);
+                child2.stdout.setEncoding('utf-8');
+                child2.stdout.on("data", (data: any) => {
+                    console.log(data);
+
+                });
+                child2.stderr.setEncoding('utf-8');
+                child2.stderr.on("data", (data) => {
+                    console.error(data);
+                });
+                waitForPathToBeCreated(name + "/package.json").then(() => {
+                    //Inserting dependencies into pacakge.json
+                    readFile(name + "/package.json", "utf-8", (err, text) => {
+                        let json = JSON.parse(text);
+                        json.dependencies["cessnalib"] = "^0.2.0";
+                        json.dependencies["@euglena/core"] = "0.1.6";
+                        json.dependencies["@euglena/template"] = "1.0.1";
+                        json.dependencies["@euglena/organelle.time.js"] = "^0.1.0";
+                        text = beautify(json, null, 2, 10);
+                        writeFile(name + "/package.json", text, { "encoding": "utf-8" }, err_back);
+                    });
+                });
+                waitForPathToBeCreated([name + "/src/app/app.component.ts",name + "/src/app/app.module.ts"]).then(() => {
+                    //Copying file 
+                    console.log("Copying files into the new project.");
+                    exec('cp -r ' + __dirname + '/angular/** ' + name + "/src", (err, stdout, stderr) => {
+                        if (err) console.error(err);
+                    });
+                });
+                let particlesTsFile = name + "/src/euglena/particles.ts";
+                waitForPathToBeCreated(particlesTsFile).then(() => {
+                    readFile(particlesTsFile, "utf-8", (err, data) => {
+                        data = data.replace('$myself', name);
+                        writeFile(particlesTsFile, data, { "encoding": "utf-8" }, (err) => {
+                            err_back(err, particlesTsFile + " has been updated.");
+                        });
+                    });
+                });
                 break;
         }
     });
 
 program.parse(process.argv);
 
-function err_back(err: Error) { if (err) console.log(err) }
+function err_back(err: Error, success?: string) {
+    if (err) console.log(err)
+    else if (success) console.log(success);
+}
 
-function waitPackage_jsonToBeCreated(name: string, next: () => void) {
-    exists(name + "/package.json", x => {
-        if (x) {
-            next();
-        } else {
-            console.log("waiting for " + name + "/package.json");
-            setTimeout(() => waitPackage_jsonToBeCreated(name, next), 500);
+function waitForPathToBeCreated(path: string | string[]):Promise<{}> {
+    if (path instanceof Array) {
+        let promises = [];
+        for (let p of path) {
+            promises.push(waitForPathToBeCreated(p));
         }
-    });
+        return Promise.all(promises);
+    } else {
+        return new Promise((next, reject) => {
+            exists(path, x => {
+                if (x) {
+                    next();
+                } else {
+                    console.log("waiting for " + path + " to be created.");
+                    setTimeout(() => waitForPathToBeCreated(path).then(next), 500);
+                }
+            });
+        });
+
+    }
 }

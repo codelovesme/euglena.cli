@@ -5,7 +5,8 @@
         "noImplicitAny": true,
         "removeComments": false,
         "sourceMap": true,
-        "declaration":true
+        "declaration":true,
+        "experimentalDecorators": true
     },
     "files": [ "src/index.ts","src/","test/index.ts"]
 }
