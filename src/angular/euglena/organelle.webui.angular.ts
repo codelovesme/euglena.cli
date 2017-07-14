@@ -14,14 +14,17 @@ import constants = euglena_template.alive.constants;
 @Injectable()
 export class Organelle extends euglena_template.alive.organelle.WebUIOrganelle {
 
-    private map: sys.type.Map<string, ((particle, callback) => void)[]>;
+    private map: sys.type.Map<string, ((particle, callback) => void)[]> = new sys.type.Map<string, ((particle, callback) => void)[]>();
+    public sap: euglena_template.alive.particle.WebUIOrganelleSap;
     private _addAction: (particleName: string, action: (particle: Particle, callback: (particle: Particle) => void) => void) => void;
     constructor() {
         super();
-        this.map = new sys.type.Map<string, ((particle, callback) => void)[]>();
     }
     protected bindActions(addAction: (particleName: string, action: (particle: Particle, callback: (particle: Particle) => void) => void) => void): void {
         this._addAction = addAction;
+        this.addAction(constants.particles.WebUIOrganelleSap, (sap) => {
+            this.sap = sap;
+        });
     }
 
     public addAction(key: string, listener: (particle, callback) => void) {

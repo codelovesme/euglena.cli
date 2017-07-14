@@ -99,7 +99,7 @@ program
             process.stdin.pipe(child.stdin);
             break;
         case "angular":
-            let child2 = child_process_1.spawn('ng', ["new", name]);
+            let child2 = child_process_1.spawn('node', [__dirname + "/../node_modules/@angular/cli/bin/ng", "new", name]);
             child2.stdout.setEncoding('utf-8');
             child2.stdout.on("data", (data) => {
                 console.log(data);
@@ -107,6 +107,7 @@ program
             child2.stderr.setEncoding('utf-8');
             child2.stderr.on("data", (data) => {
                 console.error(data);
+                process.abort();
             });
             waitForPathToBeCreated(name + "/package.json").then(() => {
                 //Inserting dependencies into pacakge.json
