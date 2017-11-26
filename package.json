@@ -1,6 +1,6 @@
 {
   "name": "@euglena/cli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Command Line Interface to create and manage euglena projects as simple as possible",
   "scripts": {
     "build": "gulp build",
