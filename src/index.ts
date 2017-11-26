@@ -8,6 +8,7 @@ const beautify = require("json-beautify");
 
 process.title = '@euglena/cli';
 
+var Promise:any;
 var child;
 
 // executes `pwd`
@@ -159,7 +160,7 @@ function waitForPathToBeCreated(path: string | string[]):Promise<{}> {
         }
         return Promise.all(promises);
     } else {
-        return new Promise((next, reject) => {
+        return new Promise((next:any, reject:any) => {
             exists(path, x => {
                 if (x) {
                     next();
