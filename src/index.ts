@@ -8,8 +8,9 @@ const beautify = require("json-beautify");
 
 process.title = '@euglena/cli';
 
-var Promise:any;
 var child;
+
+var isWin = /^win/.test(process.platform);
 
 // executes `pwd`
 program
@@ -31,6 +32,7 @@ program
             clear: true
         };
         let bar = new ProgressBar(' generating [:bar] :percent :etas', barOpts);
+        let templateFolder = __dirname+"/../src/"+options.type;
         switch (options.type) {
             case "node":
                 //bar.tick(10);
@@ -39,12 +41,12 @@ program
                 //bar.tick(20);
                 //copy sample files into new app folder
                 console.log("Copying files into the new project.");
-                let c = exec('cp -r ' + __dirname + '/node/** ' + name, (err, stdout, stderr) => {
+                let c = exec(isWin ? 'xcopy '+templateFolder+' '+name +' /i /e': 'cp -r ' + templateFolder+'/** ' + name, (err, stdout, stderr) => {
                     if (err) console.error(err);
                 });
                 c.on('error', (err) => console.log(err));
                 //bar.tick(40);
-                let child = spawn('npm', ['init'], { cwd: name, });
+                let child = spawn(isWin ? 'npm.cmd' : 'npm', ['init'], { cwd: name, });
                 child.stdout.setEncoding('utf-8');
                 child.stderr.setEncoding('utf-8');
                 child.stdout.on("data", (data: any) => {
@@ -128,7 +130,7 @@ program
                 waitForPathToBeCreated([name + "/src/app/app.component.ts",name + "/src/app/app.module.ts"]).then(() => {
                     //Copying file 
                     console.log("Copying files into the new project.");
-                    exec('cp -r ' + __dirname + '/angular/** ' + name + "/src", (err, stdout, stderr) => {
+                    exec(isWin ? 'xcopy '+templateFolder+' '+name +'/src /i /e': 'cp -r ' + templateFolder+'/** ' + name+ "/src", (err, stdout, stderr) => {
                         if (err) console.error(err);
                     });
                 });

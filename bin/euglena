@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var program = require("commander");
-var ProgressBar = require("progress");
-var fs_1 = require("fs");
-var child_process_1 = require("child_process");
-var beautify = require("json-beautify");
+const program = require("commander");
+const ProgressBar = require("progress");
+const fs_1 = require("fs");
+const child_process_1 = require("child_process");
+const beautify = require("json-beautify");
 process.title = '@euglena/cli';
-var Promise;
 var child;
+var isWin = /^win/.test(process.platform);
 // executes `pwd`
 program
     .version('0.0.1');
-var typelist = "Here is the supported types : \n\n" +
+let typelist = "Here is the supported types : \n\n" +
     "\tnode     generates a Nodejs Application\n" +
     "\tangular  generates an Angular Application\n";
 program
@@ -21,12 +21,12 @@ program
     .description('generate a new Euglena structed application')
     .option("-t, --type <type>", "Which environment Euglena work within\n\n" + typelist)
     .action(function (name, options) {
-    var barOpts = {
+    let barOpts = {
         width: 20,
         total: 100,
         clear: true
     };
-    var bar = new ProgressBar(' generating [:bar] :percent :etas', barOpts);
+    let bar = new ProgressBar(' generating [:bar] :percent :etas', barOpts);
     switch (options.type) {
         case "node":
             //bar.tick(10);
@@ -35,26 +35,26 @@ program
             //bar.tick(20);
             //copy sample files into new app folder
             console.log("Copying files into the new project.");
-            var c = child_process_1.exec('cp -r ' + __dirname + '/node/** ' + name, function (err, stdout, stderr) {
+            let c = child_process_1.exec(isWin ? 'xcopy ' + __dirname + '\\..\\src\\node ' + name + ' /i /e' : 'cp -r ' + __dirname + '/node/** ' + name, (err, stdout, stderr) => {
                 if (err)
                     console.error(err);
             });
-            c.on('error', function (err) { return console.log(err); });
+            c.on('error', (err) => console.log(err));
             //bar.tick(40);
-            var child_1 = child_process_1.spawn('npm', ['init'], { cwd: name, });
-            child_1.stdout.setEncoding('utf-8');
-            child_1.stderr.setEncoding('utf-8');
-            child_1.stdout.on("data", function (data) {
+            let child = child_process_1.spawn(isWin ? 'npm.cmd' : 'npm', ['init'], { cwd: name, });
+            child.stdout.setEncoding('utf-8');
+            child.stderr.setEncoding('utf-8');
+            child.stdout.on("data", (data) => {
                 if (data && data.includes("Is this ok? (yes)")) {
-                    child_1.stdin.write("yes");
-                    child_1.stdin.emit("finish");
+                    child.stdin.write("yes");
+                    child.stdin.emit("finish");
                     console.log("package.json has been successfully generated");
                     process.stdin.emit("finish");
-                    var packageFile_1 = name + "/package.json";
-                    waitForPathToBeCreated(packageFile_1).then(function () {
+                    let packageFile = name + "/package.json";
+                    waitForPathToBeCreated(packageFile).then(() => {
                         //Inserting dependencies into pacakge.json
-                        fs_1.readFile(name + "/package.json", "utf-8", function (err, text) {
-                            var json = JSON.parse(text);
+                        fs_1.readFile(name + "/package.json", "utf-8", (err, text) => {
+                            let json = JSON.parse(text);
                             json.scripts.test = "mocha .dist/test/index.js";
                             json.scripts.build = "gulp build && npm test";
                             json.scripts.start = "npm run build && npm test && node .";
@@ -75,17 +75,17 @@ program
                                 "typescript": "^2.3.3"
                             };
                             text = beautify(json, null, 2, 10);
-                            fs_1.writeFile(packageFile_1, text, { "encoding": "utf-8" }, function (err) {
-                                err_back(err, packageFile_1 + " has been updated.");
+                            fs_1.writeFile(packageFile, text, { "encoding": "utf-8" }, (err) => {
+                                err_back(err, packageFile + " has been updated.");
                             });
                         });
                     });
-                    var particlesTsFile_1 = name + "/src/particles.ts";
-                    waitForPathToBeCreated(particlesTsFile_1).then(function () {
-                        fs_1.readFile(particlesTsFile_1, "utf-8", function (err, data) {
+                    let particlesTsFile = name + "/src/particles.ts";
+                    waitForPathToBeCreated(particlesTsFile).then(() => {
+                        fs_1.readFile(particlesTsFile, "utf-8", (err, data) => {
                             data = data.replace('$myself', name);
-                            fs_1.writeFile(particlesTsFile_1, data, { "encoding": "utf-8" }, function (err) {
-                                err_back(err, particlesTsFile_1 + " has been updated.");
+                            fs_1.writeFile(particlesTsFile, data, { "encoding": "utf-8" }, (err) => {
+                                err_back(err, particlesTsFile + " has been updated.");
                             });
                         });
                     });
@@ -94,26 +94,26 @@ program
                     console.log(data);
                 }
             });
-            child_1.stderr.on("data", function (data) {
+            child.stderr.on("data", (data) => {
                 console.error(data);
             });
-            process.stdin.pipe(child_1.stdin);
+            process.stdin.pipe(child.stdin);
             break;
         case "angular":
-            var child2 = child_process_1.spawn('node', [__dirname + "/../node_modules/@angular/cli/bin/ng", "new", name]);
+            let child2 = child_process_1.spawn('node', [__dirname + "/../node_modules/@angular/cli/bin/ng", "new", name]);
             child2.stdout.setEncoding('utf-8');
-            child2.stdout.on("data", function (data) {
+            child2.stdout.on("data", (data) => {
                 console.log(data);
             });
             child2.stderr.setEncoding('utf-8');
-            child2.stderr.on("data", function (data) {
+            child2.stderr.on("data", (data) => {
                 console.error(data);
                 process.abort();
             });
-            waitForPathToBeCreated(name + "/package.json").then(function () {
+            waitForPathToBeCreated(name + "/package.json").then(() => {
                 //Inserting dependencies into pacakge.json
-                fs_1.readFile(name + "/package.json", "utf-8", function (err, text) {
-                    var json = JSON.parse(text);
+                fs_1.readFile(name + "/package.json", "utf-8", (err, text) => {
+                    let json = JSON.parse(text);
                     json.dependencies["cessnalib"] = "^0.2.0";
                     json.dependencies["@euglena/core"] = "0.1.6";
                     json.dependencies["@euglena/template"] = "1.0.1";
@@ -122,20 +122,20 @@ program
                     fs_1.writeFile(name + "/package.json", text, { "encoding": "utf-8" }, err_back);
                 });
             });
-            waitForPathToBeCreated([name + "/src/app/app.component.ts", name + "/src/app/app.module.ts"]).then(function () {
+            waitForPathToBeCreated([name + "/src/app/app.component.ts", name + "/src/app/app.module.ts"]).then(() => {
                 //Copying file 
                 console.log("Copying files into the new project.");
-                child_process_1.exec('cp -r ' + __dirname + '/angular/** ' + name + "/src", function (err, stdout, stderr) {
+                child_process_1.exec('cp -r ' + __dirname + '/angular/** ' + name + "/src", (err, stdout, stderr) => {
                     if (err)
                         console.error(err);
                 });
             });
-            var particlesTsFile_2 = name + "/src/euglena/particles.ts";
-            waitForPathToBeCreated(particlesTsFile_2).then(function () {
-                fs_1.readFile(particlesTsFile_2, "utf-8", function (err, data) {
+            let particlesTsFile = name + "/src/euglena/particles.ts";
+            waitForPathToBeCreated(particlesTsFile).then(() => {
+                fs_1.readFile(particlesTsFile, "utf-8", (err, data) => {
                     data = data.replace('$myself', name);
-                    fs_1.writeFile(particlesTsFile_2, data, { "encoding": "utf-8" }, function (err) {
-                        err_back(err, particlesTsFile_2 + " has been updated.");
+                    fs_1.writeFile(particlesTsFile, data, { "encoding": "utf-8" }, (err) => {
+                        err_back(err, particlesTsFile + " has been updated.");
                     });
                 });
             });
@@ -151,22 +151,21 @@ function err_back(err, success) {
 }
 function waitForPathToBeCreated(path) {
     if (path instanceof Array) {
-        var promises = [];
-        for (var _i = 0, path_1 = path; _i < path_1.length; _i++) {
-            var p = path_1[_i];
+        let promises = [];
+        for (let p of path) {
             promises.push(waitForPathToBeCreated(p));
         }
         return Promise.all(promises);
     }
     else {
-        return new Promise(function (next, reject) {
-            fs_1.exists(path, function (x) {
+        return new Promise((next, reject) => {
+            fs_1.exists(path, x => {
                 if (x) {
                     next();
                 }
                 else {
                     console.log("waiting for " + path + " to be created.");
-                    setTimeout(function () { return waitForPathToBeCreated(path).then(next); }, 500);
+                    setTimeout(() => waitForPathToBeCreated(path).then(next), 500);
                 }
             });
         });

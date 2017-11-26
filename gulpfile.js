@@ -10,5 +10,5 @@ gulp.task('build', function () {
     var tsResult = tsProject.src()
         .pipe(tsProject());
 
-    tsResult.js.pipe(rename('euglena.js')).pipe(gulp.dest("bin"));
+    tsResult.js.pipe(rename('euglena')).pipe(gulp.dest("bin"));
 });
