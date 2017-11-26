@@ -4,7 +4,6 @@
   "description": "Command Line Interface to create and manage euglena projects as simple as possible",
   "scripts": {
     "build": "gulp build",
-    "test": "euglena n new_app -t node",
     "clean": "rm new_app -rf",
     "retest": "npm run clean && npm run build && npm run test"
   },
