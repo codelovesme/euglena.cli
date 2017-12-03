@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const path = require("path");
 const program = require("commander");
 const ProgressBar = require("progress");
 const fs_1 = require("fs");
@@ -15,6 +16,14 @@ program
 let typelist = "Here is the supported types : \n\n" +
     "\tnode     generates a Nodejs Application\n" +
     "\tangular  generates an Angular Application\n";
+function npm_install() {
+    console.log("npm install...");
+    let child = child_process_1.exec(isWin ? 'npm.cmd install' : 'npm install');
+    child.stdout.setEncoding('utf-8');
+    child.stderr.setEncoding('utf-8');
+    child.stdout.on("data", x => console.log(x));
+    child.stderr.on("data", x => console.error(x));
+}
 program
     .command('new <name>')
     .alias('n')
@@ -27,6 +36,7 @@ program
         clear: true
     };
     let bar = new ProgressBar(' generating [:bar] :percent :etas', barOpts);
+    let templateFolder = path.join(__dirname, "../src", options.type);
     switch (options.type) {
         case "node":
             //bar.tick(10);
@@ -35,13 +45,13 @@ program
             //bar.tick(20);
             //copy sample files into new app folder
             console.log("Copying files into the new project.");
-            let c = child_process_1.exec(isWin ? 'xcopy ' + __dirname + '\\..\\src\\node ' + name + ' /i /e' : 'cp -r ' + __dirname + '/node/** ' + name, (err, stdout, stderr) => {
+            let c = child_process_1.exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + ' /i /e' : 'cp -r ' + templateFolder + '/** ' + name, (err, stdout, stderr) => {
                 if (err)
                     console.error(err);
             });
             c.on('error', (err) => console.log(err));
             //bar.tick(40);
-            let child = child_process_1.spawn(isWin ? 'npm.cmd' : 'npm', ['init'], { cwd: name, });
+            let child = child_process_1.spawn(isWin ? 'npm.cmd' : 'npm', ['init'], { cwd: name });
             child.stdout.setEncoding('utf-8');
             child.stderr.setEncoding('utf-8');
             child.stdout.on("data", (data) => {
@@ -77,6 +87,11 @@ program
                             text = beautify(json, null, 2, 10);
                             fs_1.writeFile(packageFile, text, { "encoding": "utf-8" }, (err) => {
                                 err_back(err, packageFile + " has been updated.");
+                                /**
+                                 *  install dependencies
+                                 *  run npm install
+                                 */
+                                npm_install();
                             });
                         });
                     });
@@ -119,13 +134,16 @@ program
                     json.dependencies["@euglena/template"] = "1.0.1";
                     json.dependencies["@euglena/organelle.time.js"] = "^0.1.0";
                     text = beautify(json, null, 2, 10);
-                    fs_1.writeFile(name + "/package.json", text, { "encoding": "utf-8" }, err_back);
+                    fs_1.writeFile(name + "/package.json", text, { "encoding": "utf-8" }, (err) => {
+                        err_back(err, "package.json has been updated!");
+                        npm_install();
+                    });
                 });
             });
             waitForPathToBeCreated([name + "/src/app/app.component.ts", name + "/src/app/app.module.ts"]).then(() => {
                 //Copying file 
                 console.log("Copying files into the new project.");
-                child_process_1.exec('cp -r ' + __dirname + '/angular/** ' + name + "/src", (err, stdout, stderr) => {
+                child_process_1.exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + '/src /i /e' : 'cp -r ' + templateFolder + '/** ' + name + "/src", (err, stdout, stderr) => {
                     if (err)
                         console.error(err);
                 });

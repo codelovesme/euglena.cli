@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import * as path from "path";
 import * as program from "commander";
 import * as ProgressBar from "progress";
 import { mkdirSync, readFile, writeFile, exists, constants, truncateSync } from "fs";
@@ -20,6 +21,15 @@ let typelist = "Here is the supported types : \n\n" +
     "\tnode     generates a Nodejs Application\n" +
     "\tangular  generates an Angular Application\n";
 
+function npm_install() {
+    console.log("npm install...")
+    let child = exec(isWin ? 'npm.cmd install' : 'npm install');
+    child.stdout.setEncoding('utf-8');
+    child.stderr.setEncoding('utf-8');
+    child.stdout.on("data", x => console.log(x));
+    child.stderr.on("data", x => console.error(x));
+}
+
 program
     .command('new <name>')
     .alias('n')
@@ -32,7 +42,7 @@ program
             clear: true
         };
         let bar = new ProgressBar(' generating [:bar] :percent :etas', barOpts);
-        let templateFolder = __dirname+"/../src/"+options.type;
+        let templateFolder = path.join(__dirname, "../src", options.type);
         switch (options.type) {
             case "node":
                 //bar.tick(10);
@@ -41,12 +51,12 @@ program
                 //bar.tick(20);
                 //copy sample files into new app folder
                 console.log("Copying files into the new project.");
-                let c = exec(isWin ? 'xcopy '+templateFolder+' '+name +' /i /e': 'cp -r ' + templateFolder+'/** ' + name, (err, stdout, stderr) => {
+                let c = exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + ' /i /e' : 'cp -r ' + templateFolder + '/** ' + name, (err, stdout, stderr) => {
                     if (err) console.error(err);
                 });
                 c.on('error', (err) => console.log(err));
                 //bar.tick(40);
-                let child = spawn(isWin ? 'npm.cmd' : 'npm', ['init'], { cwd: name, });
+                let child = spawn(isWin ? 'npm.cmd' : 'npm', ['init'], { cwd: name });
                 child.stdout.setEncoding('utf-8');
                 child.stderr.setEncoding('utf-8');
                 child.stdout.on("data", (data: any) => {
@@ -82,6 +92,12 @@ program
                                 text = beautify(json, null, 2, 10);
                                 writeFile(packageFile, text, { "encoding": "utf-8" }, (err) => {
                                     err_back(err, packageFile + " has been updated.");
+                                    /**
+                                     *  install dependencies
+                                     *  run npm install
+                                     */
+
+                                    npm_install();
                                 });
                             });
                         });
@@ -104,7 +120,7 @@ program
                 process.stdin.pipe(child.stdin);
                 break;
             case "angular":
-                let child2 = spawn('node', [__dirname+"/../node_modules/@angular/cli/bin/ng","new", name]);
+                let child2 = spawn('node', [__dirname + "/../node_modules/@angular/cli/bin/ng", "new", name]);
                 child2.stdout.setEncoding('utf-8');
                 child2.stdout.on("data", (data: any) => {
                     console.log(data);
@@ -124,13 +140,16 @@ program
                         json.dependencies["@euglena/template"] = "1.0.1";
                         json.dependencies["@euglena/organelle.time.js"] = "^0.1.0";
                         text = beautify(json, null, 2, 10);
-                        writeFile(name + "/package.json", text, { "encoding": "utf-8" }, err_back);
+                        writeFile(name + "/package.json", text, { "encoding": "utf-8" }, (err)=>{
+                            err_back(err,"package.json has been updated!");
+                            npm_install();
+                        });
                     });
                 });
-                waitForPathToBeCreated([name + "/src/app/app.component.ts",name + "/src/app/app.module.ts"]).then(() => {
+                waitForPathToBeCreated([name + "/src/app/app.component.ts", name + "/src/app/app.module.ts"]).then(() => {
                     //Copying file 
                     console.log("Copying files into the new project.");
-                    exec(isWin ? 'xcopy '+templateFolder+' '+name +'/src /i /e': 'cp -r ' + templateFolder+'/** ' + name+ "/src", (err, stdout, stderr) => {
+                    exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + '/src /i /e' : 'cp -r ' + templateFolder + '/** ' + name + "/src", (err, stdout, stderr) => {
                         if (err) console.error(err);
                     });
                 });
@@ -154,7 +173,7 @@ function err_back(err: Error, success?: string) {
     else if (success) console.log(success);
 }
 
-function waitForPathToBeCreated(path: string | string[]):Promise<{}> {
+function waitForPathToBeCreated(path: string | string[]): Promise<{}> {
     if (path instanceof Array) {
         let promises = [];
         for (let p of path) {
@@ -162,7 +181,7 @@ function waitForPathToBeCreated(path: string | string[]):Promise<{}> {
         }
         return Promise.all(promises);
     } else {
-        return new Promise((next:any, reject:any) => {
+        return new Promise((next: any, reject: any) => {
             exists(path, x => {
                 if (x) {
                     next();
