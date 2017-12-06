@@ -71,7 +71,7 @@ program
                             readFile(name + "/package.json", "utf-8", (err, text) => {
                                 let json = JSON.parse(text);
                                 json.scripts.test = "mocha .dist/test/index.js";
-                                json.scripts.build = "gulp build && npm test";
+                                json.scripts.build = "gulp build";
                                 json.scripts.start = "npm run build && npm test && node .";
                                 json.main = ".dist/src/index.js";
                                 json.dependencies = {
