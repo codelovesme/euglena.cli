@@ -36,7 +36,7 @@ gulp.task('test', function () {
         .pipe(mocha());
 });
 
-gulp.task('build_test',gulp.series('build','test'));
+gulp.task('build&test',gulp.series('build','test'));
 
 /**
  * Run
@@ -64,13 +64,13 @@ gulp.task('stop',function(){
  * Watch
  */
 gulp.task('watch',function(){
-    gulp.watch(['src/**', 'test/**'],gulp.series('stop','build_test', 'run'));
+    gulp.watch(['src/**', 'test/**'],gulp.series('stop','build&test', 'run'));
 });
 
 /**
  * Watch changes and build, test, run again
  */
-gulp.task('start', gulp.series('build_test', 'run', 'watch'));
+gulp.task('start', gulp.series('build&test', 'run', 'watch'));
 
 
 /**
@@ -84,4 +84,4 @@ gulp.task('copy-dist', function () {
 /**
  * Deploy
  */
-gulp.task('deploy',gulp.series('build_test', 'copy-dist'));
+gulp.task('deploy',gulp.series('build&test', 'copy-dist'));
