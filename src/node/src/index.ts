@@ -5,10 +5,7 @@
 "use strict";
 import * as euglena from "@euglena/core";
 import * as euglena_template from "@euglena/template";
-import * as path from "path";
-import * as fs from "fs";
 import { sys, js } from "cessnalib";
-var jsonminify = require("jsonminify");
 
 import Particle = euglena.AnyParticle;
 import interaction = euglena.interaction;
@@ -22,8 +19,6 @@ process.on('uncaughtException', (err: any) => {
     console.log(err);
 });
 
-let applicationDirectory = path.join(path.resolve(__dirname), "../");
-
 //Load Organelles
 let euglenaName = particles[sys.type.StaticTools.Array.indexOf(particles, { meta: { name: constants.particles.EuglenaName }, data: null }, (ai: Particle, t: Particle) => ai.meta.name == t.meta.name)].data;
 let organelles: Array<euglena.alive.Organelle<any>> = [];
@@ -33,7 +28,7 @@ for (let o of organelleInfos) {
         case euglena_template.alive.particle.OrganelleInfoLocationType.NodeModules:
             let organelle: euglena.alive.Organelle<any> = null;
             try {
-                organelle = <euglena.alive.Organelle<{}>>new (require(path.join(applicationDirectory, "./node_modules/", o.data.location.path))).Organelle();
+                organelle = <euglena.alive.Organelle<{}>>new (require(o.data.location.path)).Organelle();
             } catch (e) {
                 console.log(o.data.name + " " + e.message);
             }

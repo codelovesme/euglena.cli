@@ -87,7 +87,10 @@ program
                                     "gulp": "^3.9.1",
                                     "gulp-mocha": "^4.3.1",
                                     "gulp-typescript": "^3.0.1",
-                                    "typescript": "^2.3.3"
+                                    "typescript": "^2.3.3",
+                                    "child_process": "^1.0.2",
+                                    "gulp-sourcemaps": "^2.6.1",
+                                    "merge2": "^1.2.0"
                                 };
                                 text = beautify(json, null, 2, 10);
                                 writeFile(packageFile, text, { "encoding": "utf-8" }, (err) => {
