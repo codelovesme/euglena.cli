@@ -46,8 +46,7 @@
     "gulp-mocha": "^4.3.1"
   },
   "files": [
-    "bin",
-    "src"
+    "bin"
   ],
   "engines": {
     "node": ">= 4.8.6"
