@@ -84,7 +84,7 @@ program
                                 json.devDependencies = {
                                     "@types/node": "^7.0.14",
                                     "@types/mocha": "^2.2.40",
-                                    "gulp": "^3.9.1",
+                                    "gulp": "github:gulpjs/gulp#4.0",
                                     "gulp-mocha": "^4.3.1",
                                     "gulp-typescript": "^3.0.1",
                                     "typescript": "^2.3.3",
