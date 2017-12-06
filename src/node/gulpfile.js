@@ -9,6 +9,7 @@ var tsProject = ts.createProject('tsconfig.json');
 var packagejson = require('./package.json');
 
 var distFolder = '.dist';
+var deployFolder = '../'+packagejson.name+"-dist";
 var child;
 
 /**
@@ -21,7 +22,8 @@ gulp.task('build', function () {
 
     return merge([
         tsResult.dts.pipe(gulp.dest(distFolder)),
-        tsResult.js.pipe(sourcemaps.write('./')).pipe(gulp.dest(distFolder))
+        tsResult.js.pipe(sourcemaps.write('./')).pipe(gulp.dest(distFolder)),
+        gulp.src(['README.md']).pipe(gulp.dest(distFolder))
     ]);
 });
 
@@ -33,6 +35,8 @@ gulp.task('test', function () {
     return gulp.src([distFolder+'/test/*.js'], { read: false })
         .pipe(mocha());
 });
+
+gulp.task('build_test',gulp.series('build','test'));
 
 /**
  * Run
@@ -60,15 +64,24 @@ gulp.task('stop',function(){
  * Watch
  */
 gulp.task('watch',function(){
-    gulp.watch(['src/**', 'test/**'],gulp.series('stop','build', 'test', 'run'));
+    gulp.watch(['src/**', 'test/**'],gulp.series('stop','build_test', 'run'));
 });
 
 /**
  * Watch changes and build, test, run again
  */
-gulp.task('start', gulp.series('build', 'test', 'run', 'watch'));
+gulp.task('start', gulp.series('build_test', 'run', 'watch'));
+
+
+/**
+ * Copy .dist folder files into the distribution repo
+ */
+gulp.task('copy-dist', function () {
+    return gulp.src([distFolder+"/**","!"+distFolder+"/test","!"+distFolder+"/test/**"]).pipe(gulp.dest(deployFolder));
+});
+
 
 /**
  * Deploy
  */
-gulp.task('deploy',gulp.series('build', 'test', 'run'));
+gulp.task('deploy',gulp.series('build_test', 'copy-dist'));
