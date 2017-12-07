@@ -21,9 +21,9 @@ let typelist = "Here is the supported types : \n\n" +
     "\tnode     generates a Nodejs Application\n" +
     "\tangular  generates an Angular Application\n";
 
-function npm_install(name:string) {
+function npm_install(name: string) {
     console.log("npm install...");
-    let child = exec(isWin ? 'npm.cmd install --prefix "%cd%"/'+name+" ./"+name : 'npm install');
+    let child = exec(isWin ? 'npm.cmd install --prefix "%cd%"/' + name + " ./" + name : 'npm install');
     child.stdout.setEncoding('utf-8');
     child.stderr.setEncoding('utf-8');
     child.stdout.on("data", x => console.log(x));
@@ -56,71 +56,65 @@ program
                 });
                 c.on('error', (err) => console.log(err));
                 //bar.tick(40);
-                let child = spawn(isWin ? 'npm.cmd' : 'npm', ['init'], { cwd: name });
-                child.stdout.setEncoding('utf-8');
-                child.stderr.setEncoding('utf-8');
-                child.stdout.on("data", (data: any) => {
-                    if (data && data.includes("Is this ok? (yes)")) {
-                        child.stdin.write("yes");
-                        child.stdin.emit("finish");
-                        console.log("package.json has been successfully generated");
-                        process.stdin.emit("finish");
-                        let packageFile = name + "/package.json";
-                        waitForPathToBeCreated(packageFile).then(() => {
-                            //Inserting dependencies into pacakge.json
-                            readFile(name + "/package.json", "utf-8", (err, text) => {
-                                let json = JSON.parse(text);
-                                json.scripts.test = "mocha .dist/test/index.js";
-                                json.scripts.build = "gulp build";
-                                json.scripts.start = "npm run build && npm test && node .";
-                                json.main = ".dist/src/index.js";
-                                json.dependencies = {
-                                    "cessnalib": "^0.2.0",
-                                    "@euglena/core": "0.1.6",
-                                    "@euglena/template": "1.0.1",
-                                    "@euglena/organelle.time.js": "^0.1.0",
-                                    "jsonminify": "^0.4.1"
-                                };
-                                json.devDependencies = {
-                                    "@types/node": "^7.0.14",
-                                    "@types/mocha": "^2.2.40",
-                                    "gulp": "github:gulpjs/gulp#4.0",
-                                    "gulp-mocha": "^4.3.1",
-                                    "gulp-typescript": "^3.0.1",
-                                    "typescript": "^2.3.3",
-                                    "child_process": "^1.0.2",
-                                    "gulp-sourcemaps": "^2.6.1",
-                                    "merge2": "^1.2.0"
-                                };
-                                text = beautify(json, null, 2, 10);
-                                writeFile(packageFile, text, { "encoding": "utf-8" }, (err) => {
-                                    err_back(err, packageFile + " has been updated.");
-                                    /**
-                                     *  install dependencies
-                                     *  run npm install
-                                     */
+                /**
+                 *  Wait for the package.json
+                 */
+                let packageFile = name + "/package.json";
+                waitForPathToBeCreated(packageFile).then(() => {
+                    //Inserting dependencies into pacakge.json
+                    readFile(name + "/package.json", "utf-8", (err, text) => {
+                        let json = JSON.parse(text);
+                        json.scripts.test = "mocha .dist/test/index.js";
+                        json.scripts.build = "gulp build";
+                        json.scripts.deploy = "gulp deploy";
+                        json.scripts.start = "npm run build && npm test && node .";
+                        json.main = ".dist/src/index.js";
+                        json.dependencies = {
+                            "cessnalib": "^0.2.0",
+                            "@euglena/core": "0.1.6",
+                            "@euglena/template": "1.0.1",
+                            "@euglena/organelle.time.js": "^0.1.0",
+                            "jsonminify": "^0.4.1"
+                        };
+                        json.devDependencies = {
+                            "@types/node": "^7.0.14",
+                            "@types/mocha": "^2.2.40",
+                            "gulp": "github:gulpjs/gulp#4.0",
+                            "gulp-mocha": "^4.3.1",
+                            "gulp-typescript": "^3.0.1",
+                            "typescript": "^2.3.3",
+                            "child_process": "^1.0.2",
+                            "gulp-sourcemaps": "^2.6.1",
+                            "merge2": "^1.2.0"
+                        };
+                        text = beautify(json, null, 2, 10);
+                        writeFile(packageFile, text, { "encoding": "utf-8" }, (err) => {
+                            err_back(err, packageFile + " has been updated.");
+                            /**
+                             *  install dependencies
+                             *  run npm install
+                             */
 
-                                    //npm_install(name);    ====> open after this issue closed ====> https://github.com/nathanbuchar/nathanbuchar.com/issues/28
-                                });
-                            });
+                            //npm_install(name);    ====> open after this issue closed ====> https://github.com/nathanbuchar/nathanbuchar.com/issues/28
                         });
-                        let particlesTsFile = name + "/src/particles.ts";
-                        waitForPathToBeCreated(particlesTsFile).then(() => {
-                            readFile(particlesTsFile, "utf-8", (err, data) => {
-                                data = data.replace('$myself', name);
-                                writeFile(particlesTsFile, data, { "encoding": "utf-8" }, (err) => {
-                                    err_back(err, particlesTsFile + " has been updated.");
-                                });
-                            });
+                    });
+                });
+                /**
+                 * Generate package.json
+                 */
+                spawn(isWin ? 'npm.cmd' : 'npm', ['init','--force'], { cwd: name });
+                /**
+                 * Wait for the particles.ts
+                 */
+                let particlesTsFile = name + "/src/particles.ts";
+                waitForPathToBeCreated(particlesTsFile).then(() => {
+                    readFile(particlesTsFile, "utf-8", (err, data) => {
+                        data = data.replace('$myself', name);
+                        writeFile(particlesTsFile, data, { "encoding": "utf-8" }, (err) => {
+                            err_back(err, particlesTsFile + " has been updated.");
                         });
-                    } else {
-                        console.log(data);
-                    }
+                    });
                 });
-                child.stderr.on("data", (data) => {
-                    console.error(data);
-                });
-                process.stdin.pipe(child.stdin);
                 break;
             case "angular":
                 let child2 = spawn('node', [__dirname + "/../node_modules/@angular/cli/bin/ng", "new", name]);
@@ -143,8 +137,8 @@ program
                         json.dependencies["@euglena/template"] = "1.0.1";
                         json.dependencies["@euglena/organelle.time.js"] = "^0.1.0";
                         text = beautify(json, null, 2, 10);
-                        writeFile(name + "/package.json", text, { "encoding": "utf-8" }, (err)=>{
-                            err_back(err,"package.json has been updated!");
+                        writeFile(name + "/package.json", text, { "encoding": "utf-8" }, (err) => {
+                            err_back(err, "package.json has been updated!");
                             //npm_install(name);    ====> open after this issue closed ====> https://github.com/nathanbuchar/nathanbuchar.com/issues/28
                         });
                     });
@@ -156,7 +150,7 @@ program
                         if (err) console.error(err);
                     });
                 });
-                let particlesTsFile = name + "/src/euglena/particles.ts";
+                particlesTsFile = name + "/src/euglena/particles.ts";
                 waitForPathToBeCreated(particlesTsFile).then(() => {
                     readFile(particlesTsFile, "utf-8", (err, data) => {
                         data = data.replace('$myself', name);
