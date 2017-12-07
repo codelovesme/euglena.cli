@@ -12,3 +12,7 @@ gulp.task('build', function () {
 
     tsResult.js.pipe(rename('euglena')).pipe(gulp.dest("bin"));
 });
+
+gulp.task('test',function(){
+
+});
