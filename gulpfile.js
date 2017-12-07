@@ -13,6 +13,10 @@ gulp.task('build', function () {
     tsResult.js.pipe(rename('euglena')).pipe(gulp.dest("bin"));
 });
 
-gulp.task('test',function(){
-
+/**
+ * Run tests
+ */
+gulp.task('test', function () {
+    return gulp.src(['test/index.js'], { read: false })
+        .pipe(mocha());
 });
