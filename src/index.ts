@@ -21,13 +21,10 @@ let typelist = "Here is the supported types : \n\n" +
     "\tnode     generates a Nodejs Application\n" +
     "\tangular  generates an Angular Application\n";
 
-function npm_install(name: string) {
-    console.log("npm install...");
-    let child = exec(isWin ? 'npm.cmd install --prefix "%cd%"/' + name + " ./" + name : 'npm install');
-    child.stdout.setEncoding('utf-8');
-    child.stderr.setEncoding('utf-8');
-    child.stdout.on("data", x => console.log(x));
-    child.stderr.on("data", x => console.error(x));
+function npm_install() {
+    console.log("installing dependencies...");
+    let child = spawn(isWin ? 'npm.cmd' : 'npm', ['install'], { cwd: name });
+    child.on("exit",()=>console.log("done."))
 }
 
 program
@@ -94,8 +91,7 @@ program
                              *  install dependencies
                              *  run npm install
                              */
-
-                            //npm_install(name);    ====> open after this issue closed ====> https://github.com/nathanbuchar/nathanbuchar.com/issues/28
+                            npm_install();
                         });
                     });
                 });
@@ -139,7 +135,7 @@ program
                         text = beautify(json, null, 2, 10);
                         writeFile(name + "/package.json", text, { "encoding": "utf-8" }, (err) => {
                             err_back(err, "package.json has been updated!");
-                            //npm_install(name);    ====> open after this issue closed ====> https://github.com/nathanbuchar/nathanbuchar.com/issues/28
+                            npm_install();
                         });
                     });
                 });
