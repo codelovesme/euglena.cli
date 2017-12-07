@@ -1,9 +1,12 @@
-/**
- * Created by codelovesme on 12/7/2017.
- */
+"use strict";
 
-describe("alive", () => {
-    describe("Cytoplasm", () => {
-        
+const chai = require("chai");
+describe("node", () => {
+    it("sample", () => {
+        //given
+        let target = true;
+        //when
+        //then
+        chai.expect(target).to.be.true;
     });
 });
