@@ -9,7 +9,7 @@
         // "npm run build"
         "taskName": "build",
         "isBuildCommand": true,
-        "args": ["run", "build"]
+        "args": ["build"]
         },
         {
         // Test task, Ctrl+Shift+T

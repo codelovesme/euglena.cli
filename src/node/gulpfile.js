@@ -9,7 +9,7 @@ var tsProject = ts.createProject('tsconfig.json');
 var packagejson = require('./package.json');
 
 var distFolder = '.dist';
-var deployFolder = '../'+packagejson.name+"-dist";
+var publishFolder = '../'+packagejson.name+"-dist";
 var child;
 
 /**
@@ -77,11 +77,11 @@ gulp.task('start', gulp.series('build&test', 'run', 'watch'));
  * Copy .dist folder files into the distribution repo
  */
 gulp.task('copy-dist', function () {
-    return gulp.src([distFolder+"/**","!"+distFolder+"/test","!"+distFolder+"/test/**"]).pipe(gulp.dest(deployFolder));
+    return gulp.src([distFolder+"/**","!"+distFolder+"/test","!"+distFolder+"/test/**"]).pipe(gulp.dest(publishFolder));
 });
 
 
 /**
- * Deploy
+ * Publish
  */
-gulp.task('deploy',gulp.series('build&test', 'copy-dist'));
+gulp.task('publish',gulp.series('build&test', 'copy-dist'));
