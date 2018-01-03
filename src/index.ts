@@ -6,6 +6,7 @@ import * as ProgressBar from "progress";
 import { mkdirSync, readFile, writeFile, exists, constants, truncateSync } from "fs";
 import { exec, spawnSync, spawn } from 'child_process';
 const beautify = require("json-beautify");
+const packageJson = require('../package.json');
 
 process.title = '@euglena/cli';
 
@@ -15,16 +16,16 @@ var isWin = /^win/.test(process.platform);
 
 // executes `pwd`
 program
-    .version('0.0.1');
+    .version(packageJson.version);
 
 let typelist = "Here is the supported types : \n\n" +
     "\tnode     generates a Nodejs Application\n" +
     "\tangular  generates an Angular Application\n";
 
-function npm_install(name:string) {
+function npm_install(name: string) {
     console.log("installing dependencies...");
     let child = spawn(isWin ? 'npm.cmd' : 'npm', ['install'], { cwd: name });
-    child.on("exit",()=>console.log("done."))
+    child.on("exit", () => console.log("done."))
 }
 
 program
@@ -32,7 +33,7 @@ program
     .alias('n')
     .description('generate a new Euglena structed application')
     .option("-t, --type <type>", "Which environment Euglena work within\n\n" + typelist)
-    .action(function (name, options) {
+    .action((name: string, options: { type: string }) => {
         let barOpts = {
             width: 20,
             total: 100,
@@ -41,7 +42,7 @@ program
         let bar = new ProgressBar(' generating [:bar] :percent :etas', barOpts);
         let templateFolder = path.join(__dirname, "../src", options.type);
         switch (options.type) {
-            case "node":
+            case "organelle":
                 //bar.tick(10);
                 console.log("Generating directory structure.");
                 mkdirSync(name);
@@ -57,6 +58,64 @@ program
                  *  Wait for the package.json
                  */
                 let packageFile = name + "/package.json";
+                waitForPathToBeCreated(packageFile).then(() => {
+                    //Inserting dependencies into pacakge.json
+                    readFile(name + "/package.json", "utf-8", (err, text) => {
+                        let json = JSON.parse(text);
+                        json.scripts.test = "mocha .dist/test/index.js";
+                        json.scripts.build = "gulp build";
+                        json.scripts.deploy = "gulp deploy";
+                        json.scripts.start = "npm run build && npm test && node .";
+                        json.main = ".dist/src/index.js";
+                        json.dependencies = {
+                            "cessnalib": "^0.7.0",
+                            "@euglena/core": "0.1.6",
+                            "@euglena/template": "2.0.0",
+                            "@euglena/organelle.time.js": "^0.1.0",
+                            "jsonminify": "^0.4.1"
+                        };
+                        json.devDependencies = {
+                            "@types/node": "^7.0.14",
+                            "@types/mocha": "^2.2.40",
+                            "gulp": "github:gulpjs/gulp#4.0",
+                            "gulp-mocha": "^4.3.1",
+                            "gulp-typescript": "^3.0.1",
+                            "typescript": "^2.3.3",
+                            "gulp-sourcemaps": "^2.6.1",
+                            "merge2": "^1.2.0"
+                        };
+                        text = beautify(json, null, 2, 10);
+                        writeFile(packageFile, text, { "encoding": "utf-8" }, (err) => {
+                            err_back(err, packageFile + " has been updated.");
+                            /**
+                             *  install dependencies
+                             *  run npm install
+                             */
+                            npm_install(name);
+                        });
+                    });
+                });
+                /**
+                 * Generate package.json
+                 */
+                spawn(isWin ? 'npm.cmd' : 'npm', ['init', '--force'], { cwd: name });
+            break;
+            case "node":
+                //bar.tick(10);
+                console.log("Generating directory structure.");
+                mkdirSync(name);
+                //bar.tick(20);
+                //copy sample files into new app folder
+                console.log("Copying files into the new project.");
+                c = exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + ' /i /e' : 'cp -r ' + templateFolder + '/** ' + name, (err, stdout, stderr) => {
+                    if (err) console.error(err);
+                });
+                c.on('error', (err) => console.log(err));
+                //bar.tick(40);
+                /**
+                 *  Wait for the package.json
+                 */
+                packageFile = name + "/package.json";
                 waitForPathToBeCreated(packageFile).then(() => {
                     //Inserting dependencies into pacakge.json
                     readFile(name + "/package.json", "utf-8", (err, text) => {
@@ -98,7 +157,7 @@ program
                 /**
                  * Generate package.json
                  */
-                spawn(isWin ? 'npm.cmd' : 'npm', ['init','--force'], { cwd: name });
+                spawn(isWin ? 'npm.cmd' : 'npm', ['init', '--force'], { cwd: name });
                 /**
                  * Wait for the particles.ts
                  */
