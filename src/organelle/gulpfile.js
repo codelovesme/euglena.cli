@@ -28,9 +28,14 @@ gulp.task('test', function () {
 });
 
 /**
+ * build & test
+ */
+gulp.task('buildAndTest',gulp.series('build','test'));
+
+/**
  * Watch files and run tests
  */
 
 gulp.task('watch', function () {
-    gulp.watch(['src/**', 'test/**'], ['build','test']);
+    gulp.watch(['src/**', 'test/**'], gulp.series('buildAndTest'));
 });

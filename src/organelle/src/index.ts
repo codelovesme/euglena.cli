@@ -22,7 +22,7 @@ export interface SapContent {
 export class Organelle extends euglena.alive.Organelle<SapContent> {
     private sapContent: particles.DbOrganelleSapContent;
     constructor() {
-        super(this_.name,);
+        super(this_.name);
         this_ = this;
     }
     protected bindActions(addAction: (particleName: string, action: (particle: Particle, callback: (particle: Particle) => void) => void) => void): void {
@@ -35,12 +35,12 @@ export class Organelle extends euglena.alive.Organelle<SapContent> {
             if (callback) {
                 callback(response);
             } else {
-                this_.send(response,this_.name);
+                this_.send(response);
             }
         });
     }
     private getAlive() {
-        this_.send(new euglena.ParticleV2(new euglena.MetaV2("NewOrganelleGotAlived",this.sapContent.euglenaName)),this_.name);
+        this_.send(new euglena.ParticleV2(new euglena.MetaV2("NewOrganelleGotAlived",this.sapContent.euglenaName)));
     }
 }
 

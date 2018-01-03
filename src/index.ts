@@ -56,7 +56,7 @@ program
                 child_process = exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + ' /i /e' : 'cp -r ' + templateFolder + '/** ' + name, (err, stdout, stderr) => {
                     if (err) console.error(err);
                 });
-                child_process.on('error', (err) => console.log(err));
+                child_process.on('error', (err:any) => console.log(err));
                 //bar.tick(40);
                 /**
                  *  Wait for the package.json
@@ -66,19 +66,19 @@ program
                     //Inserting dependencies into pacakge.json
                     readFile(name + "/package.json", "utf-8", (err, text) => {
                         let json = JSON.parse(text);
-                        json.scripts.test = "mocha .dist/test/index.js";
+                        json.scripts.test = "gulp test";
                         json.scripts.build = "gulp build";
-                        json.scripts.deploy = "gulp deploy";
-                        json.scripts.start = "npm run build && npm test && node .";
+                        json.scripts.start = "gulp buildAndTest && gulp watch";
                         json.main = ".dist/src/index.js";
                         json.dependencies = {
                             "cessnalib": "^0.7.0",
-                            "@euglena/core": "0.1.6",
-                            "@euglena/template": "2.0.0",
+                            "@euglena/core": "^0.1.7",
+                            "@euglena/template": "^2.0.0",
                             "@euglena/organelle.time.js": "^0.1.0",
                             "jsonminify": "^0.4.1"
                         };
                         json.devDependencies = {
+                            "@types/chai": "^4.0.10",
                             "@types/node": "^7.0.14",
                             "@types/mocha": "^2.2.40",
                             "gulp": "github:gulpjs/gulp#4.0",
@@ -86,7 +86,8 @@ program
                             "gulp-typescript": "^3.0.1",
                             "typescript": "^2.3.3",
                             "gulp-sourcemaps": "^2.6.1",
-                            "merge2": "^1.2.0"
+                            "merge2": "^1.2.0",
+                            "chai": "^4.1.2",
                         };
                         text = beautify(json, null, 2, 10);
                         writeFile(packageFile, text, { "encoding": "utf-8" }, (err) => {
