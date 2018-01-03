@@ -41,6 +41,10 @@ program
         };
         let bar = new ProgressBar(' generating [:bar] :percent :etas', barOpts);
         let templateFolder = path.join(__dirname, "../src", options.type);
+        let packageFile = "";
+        let child_process;
+        let particlesTsFile = "";
+
         switch (options.type) {
             case "organelle":
                 //bar.tick(10);
@@ -48,16 +52,16 @@ program
                 mkdirSync(name);
                 //bar.tick(20);
                 //copy sample files into new app folder
-                console.log("Copying files into the new project.");
-                let c = exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + ' /i /e' : 'cp -r ' + templateFolder + '/** ' + name, (err, stdout, stderr) => {
+                console.log("Copying files into the new project "+name);
+                child_process = exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + ' /i /e' : 'cp -r ' + templateFolder + '/** ' + name, (err, stdout, stderr) => {
                     if (err) console.error(err);
                 });
-                c.on('error', (err) => console.log(err));
+                child_process.on('error', (err) => console.log(err));
                 //bar.tick(40);
                 /**
                  *  Wait for the package.json
                  */
-                let packageFile = name + "/package.json";
+                packageFile = name + "/package.json";
                 waitForPathToBeCreated(packageFile).then(() => {
                     //Inserting dependencies into pacakge.json
                     readFile(name + "/package.json", "utf-8", (err, text) => {
@@ -106,11 +110,11 @@ program
                 mkdirSync(name);
                 //bar.tick(20);
                 //copy sample files into new app folder
-                console.log("Copying files into the new project.");
-                c = exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + ' /i /e' : 'cp -r ' + templateFolder + '/** ' + name, (err, stdout, stderr) => {
+                console.log("Copying files into the new project "+name);
+                child_process = exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + ' /i /e' : 'cp -r ' + templateFolder + '/** ' + name, (err, stdout, stderr) => {
                     if (err) console.error(err);
                 });
-                c.on('error', (err) => console.log(err));
+                child_process.on('error', (err) => console.log(err));
                 //bar.tick(40);
                 /**
                  *  Wait for the package.json
@@ -161,7 +165,7 @@ program
                 /**
                  * Wait for the particles.ts
                  */
-                let particlesTsFile = name + "/src/particles.ts";
+                particlesTsFile = name + "/src/particles.ts";
                 waitForPathToBeCreated(particlesTsFile).then(() => {
                     readFile(particlesTsFile, "utf-8", (err, data) => {
                         data = data.replace('$myself', name);
