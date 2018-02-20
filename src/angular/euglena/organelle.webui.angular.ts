@@ -11,10 +11,11 @@ import Exception = sys.type.Exception;
 import constants = euglena_template.alive.constants;
 
 
+const map: sys.type.Map<string, ((particle, callback) => void)[]> = new sys.type.Map<string, ((particle, callback) => void)[]>();
+
 @Injectable()
 export class Organelle extends euglena_template.alive.organelle.WebUIOrganelle {
 
-    private map: sys.type.Map<string, ((particle, callback) => void)[]> = new sys.type.Map<string, ((particle, callback) => void)[]>();
     public sap: euglena_template.alive.particle.WebUIOrganelleSap;
     private _addAction: (particleName: string, action: (particle: Particle, callback: (particle: Particle) => void) => void) => void;
     constructor() {
@@ -28,13 +29,13 @@ export class Organelle extends euglena_template.alive.organelle.WebUIOrganelle {
     }
 
     public addAction(key: string, listener: (particle, callback) => void) {
-        let listeners = this.map.get(key);
+        let listeners = map.get(key);
         if (listeners) {
             listeners.push(listener);
         } else {
-            this.map.set(key, [listener]);
+            map.set(key, [listener]);
             this._addAction(key, (particle, callback) => {
-                let ll = this.map.get(key);
+                let ll = map.get(key);
                 for (let l of ll) {
                     l(particle, callback);
                 }
