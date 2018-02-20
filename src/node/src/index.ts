@@ -41,6 +41,6 @@ for (let o of organelleInfos) {
 
 //Load Genes
 
-new euglena.alive.Cytoplasm(euglenaName, particles, organelles, chromosome);
+new euglena.alive.Cytoplasm(particles, organelles, chromosome,euglenaName);
 
 euglena.alive.Cytoplasm.receive(new euglena_template.alive.particle.EuglenaHasBeenBorn(euglenaName), "universe");
