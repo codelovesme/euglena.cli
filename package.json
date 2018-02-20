@@ -28,10 +28,10 @@
     "commander": "^2.9.0",
     "json-beautify": "^1.0.1",
     "progress": "^2.0.0",
-    "sys": "0.0.1"
+    "sys": "0.0.1",
+    "@angular/cli": "^1.0.6"
   },
   "devDependencies": {
-    "@angular/cli": "^1.0.6",
     "@types/chai": "^3.5.2",
     "@types/commander": "^2.9.0",
     "@types/gulp": "^4.0.4",
