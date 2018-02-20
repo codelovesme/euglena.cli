@@ -52,11 +52,11 @@ program
                 mkdirSync(name);
                 //bar.tick(20);
                 //copy sample files into new app folder
-                console.log("Copying files into the new project "+name);
-                child_process = exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + ' /i /e' : 'cp -a ' + templateFolder + '/ ' + name+"/", (err, stdout, stderr) => {                
+                console.log("Copying files into the new project " + name);
+                child_process = exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + ' /i /e' : 'cp -a ' + templateFolder + '/ ' + name + "/", (err, stdout, stderr) => {
                     if (err) console.error(err);
                 });
-                child_process.on('error', (err:any) => console.log(err));
+                child_process.on('error', (err: any) => console.log(err));
                 //bar.tick(40);
                 /**
                  *  Wait for the package.json
@@ -90,6 +90,9 @@ program
                             "merge2": "^1.2.0",
                             "chai": "^4.1.2",
                         };
+                        json.files = [
+                            ".dist/src/*"
+                        ];
                         text = beautify(json, null, 2, 10);
                         writeFile(packageFile, text, { "encoding": "utf-8" }, (err) => {
                             err_back(err, packageFile + " has been updated.");
@@ -105,15 +108,15 @@ program
                  * Generate package.json
                  */
                 spawn(isWin ? 'npm.cmd' : 'npm', ['init', '--force'], { cwd: name });
-            break;
+                break;
             case "node":
                 //bar.tick(10);
                 console.log("Generating directory structure.");
                 mkdirSync(name);
                 //bar.tick(20);
                 //copy sample files into new app folder
-                console.log("Copying files into the new project "+name);
-                child_process = exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + ' /i /e' : 'cp -a ' + templateFolder + '/ ' + name+"/", (err, stdout, stderr) => {                
+                console.log("Copying files into the new project " + name);
+                child_process = exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + ' /i /e' : 'cp -a ' + templateFolder + '/ ' + name + "/", (err, stdout, stderr) => {
                     if (err) console.error(err);
                 });
                 child_process.on('error', (err) => console.log(err));
