@@ -1,7 +1,3 @@
-.git/
-node_modules/
+wnode_modules/
 yarn-error.log
 yarn.lock
-.dist
-
-
