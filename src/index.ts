@@ -70,6 +70,7 @@ program
                         json.scripts.build = "gulp build";
                         json.scripts.start = "gulp buildAndTest && gulp watch";
                         json.main = ".dist/src/index.js";
+                        json.typings = ".dist/src/index.d.ts";
                         json.dependencies = {
                             "cessnalib": "^0.7.0",
                             "@euglena/core": "^0.1.7",
