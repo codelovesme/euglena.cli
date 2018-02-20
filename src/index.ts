@@ -53,7 +53,7 @@ program
                 //bar.tick(20);
                 //copy sample files into new app folder
                 console.log("Copying files into the new project "+name);
-                child_process = exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + ' /i /e' : 'cp -r ' + templateFolder + '/** ' + name, (err, stdout, stderr) => {
+                child_process = exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + ' /i /e' : 'cp -r ' + templateFolder +" "+ name, (err, stdout, stderr) => {
                     if (err) console.error(err);
                 });
                 child_process.on('error', (err:any) => console.log(err));
@@ -112,7 +112,7 @@ program
                 //bar.tick(20);
                 //copy sample files into new app folder
                 console.log("Copying files into the new project "+name);
-                child_process = exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + ' /i /e' : 'cp -r ' + templateFolder + '/** ' + name, (err, stdout, stderr) => {
+                child_process = exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + ' /i /e' : 'cp -r ' + templateFolder + ' ' + name, (err, stdout, stderr) => {
                     if (err) console.error(err);
                 });
                 child_process.on('error', (err) => console.log(err));
@@ -206,7 +206,7 @@ program
                 waitForPathToBeCreated([name + "/src/app/app.component.ts", name + "/src/app/app.module.ts"]).then(() => {
                     //Copying file 
                     console.log("Copying files into the new project.");
-                    exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + '/src /i /e' : 'cp -r ' + templateFolder + '/** ' + name + "/src", (err, stdout, stderr) => {
+                    exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + '/src /i /e' : 'cp -r ' + templateFolder + ' ' + name + "/src", (err, stdout, stderr) => {
                         if (err) console.error(err);
                     });
                 });
