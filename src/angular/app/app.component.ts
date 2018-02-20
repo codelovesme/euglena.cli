@@ -12,7 +12,7 @@ export class AppComponent {
   title = 'app works!';
   constructor(_: Euglena, organelle: Organelle) {
     organelle.addAction(euglena_template.alive.constants.particles.Time, (particle: euglena_template.alive.particle.Time) => {
-      this.title = "It is "+particle.data.clock.hour+" : "+particle.data.clock.minute + " : " + particle.data.clock.second;
+      this.title = particle.data.clock.hour+" : "+particle.data.clock.minute + " : " + particle.data.clock.second;
     });
   }
 }
