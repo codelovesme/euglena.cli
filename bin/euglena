@@ -127,8 +127,8 @@ program
                     json.main = ".dist/src/index.js";
                     json.dependencies = {
                         "cessnalib": "^0.2.0",
-                        "@euglena/core": "0.1.6",
-                        "@euglena/template": "1.0.1",
+                        "@euglena/core": "0.1.7",
+                        "@euglena/template": "2.0.3",
                         "@euglena/organelle.time.js": "^0.1.0",
                         "jsonminify": "^0.4.1"
                     };
