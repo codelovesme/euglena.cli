@@ -6,6 +6,7 @@
 import * as euglena from "@euglena/core";
 import * as euglena_template from "@euglena/template";
 import { sys, js } from "cessnalib";
+import * as path from "path";
 
 import Particle = euglena.AnyParticle;
 import interaction = euglena.interaction;
@@ -14,6 +15,7 @@ import OrganelleInfo = euglena_template.alive.particle.OrganelleInfo;
 
 import * as particles from "./particles";
 import * as chromosome from "./chromosome";
+
 
 process.on('uncaughtException', (err: any) => {
     console.log(err);
@@ -36,11 +38,22 @@ for (let o of organelleInfos) {
             organelles.push(organelle);
             console.log(`${organelle.name} attached to the body.`);
             break;
+        case euglena_template.alive.particle.OrganelleInfoLocationType.FileSystemPath:
+            let organelle2 = null;
+            try {
+                organelle2 = new (require(path.join(__dirname, o.data.location.path)).Organelle)();
+            } catch (e) {
+                console.log(o.data.name + " " + e.message);
+            }
+            if (!organelle2) continue;
+            organelles.push(organelle2);
+            console.log(`${organelle2.name} attached to the body.`);
+            break;
     }
 }
 
 //Load Genes
 
-new euglena.alive.Cytoplasm(particles, organelles, chromosome,euglenaName);
+new euglena.alive.Cytoplasm(particles, organelles, chromosome, euglenaName);
 
 euglena.alive.Cytoplasm.receive(new euglena_template.alive.particle.EuglenaHasBeenBorn(euglenaName), "universe");
