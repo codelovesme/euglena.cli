@@ -15,4 +15,5 @@ euglena new `application_name` -t node
 ```
 
 set the type of the application by -t, --type 
+
 Available types *node*, *angular*, *organelle*
