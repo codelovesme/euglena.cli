@@ -1,0 +1,29 @@
+{
+  "name": "drive",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@euglena/core": "^0.1.7",
+    "@euglena/organelle.time.js": "^0.1.0",
+    "@euglena/template": "^2.2.0",
+    "cessnalib": "^0.7.0",
+    "react": "^16.8.3",
+    "react-dom": "^16.8.3",
+    "react-scripts-ts": "3.1.0",
+    "uuid": "^3.3.2"
+  },
+  "scripts": {
+    "start": "react-scripts-ts start",
+    "build": "react-scripts-ts build",
+    "test": "react-scripts-ts test --env=jsdom",
+    "eject": "react-scripts-ts eject"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.9",
+    "@types/node": "^11.10.4",
+    "@types/react": "^16.8.6",
+    "@types/react-dom": "^16.8.2",
+    "@types/uuid": "^3.4.4",
+    "typescript": "^3.3.3333"
+  }
+}

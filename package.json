@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/codelovesme/euglena.cli#readme",
   "dependencies": {
+    "@angular/cli": "^7.1.1",
     "@euglena/core": "^0.1.6",
     "@euglena/template": "^1.0.1",
     "cessnalib": "^0.2.0",
@@ -29,7 +30,7 @@
     "json-beautify": "^1.0.1",
     "progress": "^2.0.0",
     "sys": "0.0.1",
-    "@angular/cli": "^1.0.6"
+    "typescript": "^3.2.1"
   },
   "devDependencies": {
     "@types/chai": "^3.5.2",
@@ -43,8 +44,7 @@
     "gulp-mocha": "^4.3.1",
     "gulp-rename": "^1.2.2",
     "gulp-typescript": "^3.2.2",
-    "mocha": "^3.4.2",
-    "typescript": "^2.6.1"
+    "mocha": "^3.4.2"
   },
   "files": [
     "bin",

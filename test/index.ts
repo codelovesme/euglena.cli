@@ -1,6 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const chai = require("chai");
+import * as chai from "chai";
+
 describe("node", () => {
     it("sample", () => {
         //given
@@ -10,4 +9,3 @@ describe("node", () => {
         chai.expect(target).to.be.true;
     });
 });
-//# sourceMappingURL=index.js.map

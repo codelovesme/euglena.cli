@@ -19,8 +19,9 @@ program
     .version(packageJson.version);
 
 let typelist = "Here is the supported types : \n\n" +
-    "\tnode     generates a Nodejs Application\n" +
-    "\tangular  generates an Angular Application\n";
+    "\t node     generates a Nodejs Application\n" +
+    "\t react     generates a Reactjs Application\n" +
+    "\t angular  generates an Angular Application\n";
 
 function npm_install(name: string) {
     console.log("installing dependencies...");
@@ -46,6 +47,15 @@ program
         let particlesTsFile = "";
 
         switch (options.type) {
+            case "react":
+                console.log("Generating directory structure.");
+                mkdirSync(name);
+                console.log("Copying files into the new project " + name);
+                child_process = exec(isWin ? 'xcopy ' + templateFolder + ' ' + name + ' /i /e' : 'cp -a ' + templateFolder + '/ ' + name + "/", (err, stdout, stderr) => {
+                    if (err) console.error(err);
+                });
+                child_process.on('error', (err: any) => console.log(err));
+                break;
             case "organelle":
                 //bar.tick(10);
                 console.log("Generating directory structure.");
@@ -196,9 +206,9 @@ program
                     //Inserting dependencies into pacakge.json
                     readFile(name + "/package.json", "utf-8", (err, text) => {
                         let json = JSON.parse(text);
-                        json.dependencies["cessnalib"] = "^0.2.0";
-                        json.dependencies["@euglena/core"] = "0.1.6";
-                        json.dependencies["@euglena/template"] = "1.0.1";
+                        json.dependencies["cessnalib"] = "^0.7.0";
+                        json.dependencies["@euglena/core"] = "^0.1.7";
+                        json.dependencies["@euglena/template"] = "^2.2.0";
                         json.dependencies["@euglena/organelle.time.js"] = "^0.1.0";
                         text = beautify(json, null, 2, 10);
                         writeFile(name + "/package.json", text, { "encoding": "utf-8" }, (err) => {
